@@ -8,33 +8,27 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
 void main() {
-  runApp( TestPostmessageApp());
+  runApp( const TestPostMessageApp());
 }
 
 
 
-class TestPostmessageApp extends StatefulWidget{
+class TestPostMessageApp extends StatefulWidget{
 
   final paymentUrl = "https://fc.gerc.ua:8443/api_test/postMessage.php";
 
-  const TestPostmessageApp({super.key});
+  const TestPostMessageApp({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return TestPostmessageAppState();
+    return TestPostMessageAppState();
   }
 
 }
 
-class TestPostmessageAppState extends State<TestPostmessageApp>{
+class TestPostMessageAppState extends State<TestPostMessageApp>{
 
   late WebViewController _controller;
-
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<bool> initStateAsync() async {
 
@@ -55,7 +49,6 @@ class TestPostmessageAppState extends State<TestPostmessageApp>{
             }
           }
         }));
-
 
     await controller.loadRequest(Uri.parse(
         widget.paymentUrl));
