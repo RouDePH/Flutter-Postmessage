@@ -4,12 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-// Import for Android features.
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-// Import for iOS features.
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
-
 
 void main() {
   runApp( TestPostmessageApp());
@@ -42,9 +38,7 @@ class TestPostmessageAppState extends State<TestPostmessageApp>{
 
   Future<bool> initStateAsync() async {
 
-
     var controller = WebViewController();
-
     await controller.setJavaScriptMode(JavaScriptMode.unrestricted);
 
     await (controller.platform as AndroidWebViewController)
@@ -54,7 +48,6 @@ class TestPostmessageAppState extends State<TestPostmessageApp>{
           print('GERC : ${message.message}');
 
           var data = json.decode(message.message);
-
 
           if (data.containsKey('type')) {
             if (data['type'] == "payment-status") {
@@ -104,7 +97,6 @@ class TestPostmessageAppState extends State<TestPostmessageApp>{
     }));
 
     _controller = controller;
-
     return true;
   }
 
@@ -118,10 +110,15 @@ class TestPostmessageAppState extends State<TestPostmessageApp>{
                     future: initStateAsync(),
                     builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
                       switch (snapshot.connectionState){
-                        case ConnectionState.waiting: return Container();
-                        default:
-                          return WebViewWidget(controller: _controller);
-                      }
+                        case ConnectionState.waiting:
+                        return const Center(
+                          child: Text("Loading.."),
+                        );
+                      default:
+                          return snapshot.data!
+                            ? WebViewWidget(controller: _controller)
+                            : const Center(child: Text("Error"));
+                    }
                     })
             )
         ),
@@ -129,85 +126,3 @@ class TestPostmessageAppState extends State<TestPostmessageApp>{
   }
 
 }
-//
-//
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(title: Text('WebView with postMessage Listener')),
-//         body: WebViewWithPostMessageListener(),
-//       ),
-//     );
-//   }
-// }
-//
-// class WebViewWithPostMessageListener extends StatefulWidget {
-//   @override
-//   _WebViewWithPostMessageListenerState createState() =>
-//       _WebViewWithPostMessageListenerState();
-// }
-//
-// class _WebViewWithPostMessageListenerState
-//     extends State<WebViewWithPostMessageListener> {
-//   final webViewPlugin = FlutterWebviewPlugin();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//
-//     webViewPlugin.onStateChanged.listen((WebViewStateChanged state) {
-//       if (state.type == WebViewState.finishLoad) {
-//
-//         webViewPlugin.evalJavascript("""
-//                  window.parent.postMessage = function(data) {
-//                             window.GERC.postMessage(JSON.stringify(data));
-//                         };
-//               """);
-//         webViewPlugin.evalJavascript('''
-//           window.addEventListener("message", (event) => {
-//             window.parent.postMessage(JSON.stringify(event.data));
-//           });
-//         ''');
-//       }
-//     });
-//
-//     webViewPlugin.evalJavascript("""
-//                  window.parent.postMessage = function(data) {
-//                             window.GERC.postMessage(JSON.stringify(data));
-//                         };
-//               """);
-//
-//     // webViewPlugin.onJavascriptChannelReceive.listen((JavascriptChannelMessage message) {
-//     //   print('Received message from WebView: ${message.message}');
-//     // });
-//   }
-//
-//   @override
-//   void dispose() {
-//     webViewPlugin.dispose();
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return WebviewScaffold(
-//       url: 'https://fc.gerc.ua:8443/api_test/postMessage.php',
-//       headers: <String, String>{
-//         'Access-Control-Allow-Origin': '*',
-//         'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-//         'Access-Control-Allow-Credentials': 'true',
-//         'Content-Type': 'type="text/javascript'
-//       },
-//       javascriptChannels: {
-//         JavascriptChannel(
-//           name: 'parent',
-//           onMessageReceived: (JavascriptMessage message) {
-//             print('Received message from WebView: ${message.message}');
-//           },
-//         ),
-//       },
-//     );
-//   }
-// }
